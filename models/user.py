@@ -8,9 +8,14 @@ class UserModel(db.Model):
     password = db.Column(db.String(80))
     saved = db.Column(db.String(250))
     saved_count = db.Column(db.Integer)
+    following = db.Column(db.String(250))
+    following_count = db.Column(db.Integer)
+    followed_by = db.Column(db.String(250))
+    followed_by_count = db.Column(db.Integer)
     question = db.Column(db.String(100))
     answer = db.Column(db.String(40))
     intro = db.Column(db.String(20))
+
 
     def __init__(self, username, password, question, answer, intro):
         self.username = username

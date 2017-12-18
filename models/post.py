@@ -1,4 +1,5 @@
 from db import db
+from sqlalchemy import desc
 
 class PostModel(db.Model):
     __tablename__ = 'posts'
@@ -21,7 +22,7 @@ class PostModel(db.Model):
         return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'username': self.username, 'content': self.content, 'saved': self.saved}
 
     @classmethod
-    def filter_by_name(cls, username):
+    def filter_by_username(cls, username):
         return cls.query.filter_by(username=username).all()
 
     @classmethod
@@ -31,6 +32,10 @@ class PostModel(db.Model):
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).first()
+
+    @classmethod
+    def filter_by_most_saved(cls):
+        return cls.query.order_by(desc(PostModel.saved)).all()
 
     def save_to_db(self):
         db.session.add(self)

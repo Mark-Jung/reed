@@ -6,12 +6,10 @@ from werkzeug.security import safe_str_cmp
 class SavedController():
 
     def increment_post_saved(postid):
-        
         target_post = PostModel.find_by_id(postid)
         if target_post is None:
             return "Target post not found"
-        next_value = target_post.saved + 1
-        target_post.saved = next_value
+        target_post.saved += 1
         target_post.save_to_db()
         return ""
 
