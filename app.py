@@ -22,7 +22,7 @@ jwt = JWT(app, authenticate, identity)  # /auth jwt creates this endpoint
 api.add_resource(Post, '/posts')
 api.add_resource(PostList, '/postlist/<string:mode>/<string:key>')
 api.add_resource(UserRegister, '/register')
-api.add_resource(User, '/user/<int:_id>')
+api.add_resource(User, '/user/<string:username>')
 api.add_resource(SavedUpdate, '/saved/<string:mode>/<string:postid>')
 
 if __name__ == '__main__':

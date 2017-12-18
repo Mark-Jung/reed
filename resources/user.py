@@ -60,23 +60,26 @@ class User(Resource):
         )
    
     @jwt_required()
-    def get(self, _id):
-        target_user = UserModel.find_by_id(_id)
+    def get(self, username):
+        target_user = UserModel.find_by_username(username)
         if target_user:
             return {"user": target_user.json()}
         else:
             return {"message": "A user with that username does not exist"}, 400
 
     @jwt_required()
-    def put(self, _id):
+    def put(self, username):
         data = User.parser.parse_args()
-        caller_id = current_identity.id
-        error_message, myfault = UserController.user_update(caller_id, _id, data["mode"], data["payload"])
+        caller_username = current_identity.username
+        error_message, myfault = UserController.user_update(caller_username, username, data["mode"], data["payload"])
         if error_message and myfault:
             return {"message": error_message}, 500
         elif error_message and not myfault:
             return {"message": error_message}, 400
         elif not error_message and not myfault:
             return {"message": "Success!"}, 200
-        
+        elif not error_message and type(myfault) is list:
+            return myfault, 200
 
+        
+        

@@ -26,7 +26,7 @@ class UserModel(db.Model):
         self.intro = intro 
 
     def json(self):
-        return {'id': self.id, 'username': self.username, 'question': self.question, 'answer': self.answer, 'saved': self.saved, 'saved_count': self.saved_count, 'intro': self.intro}
+        return {'id': self.id, 'username': self.username, 'question': self.question, 'answer': self.answer, 'saved': self.saved, 'saved_count': self.saved_count, 'following_count': self.following_count, 'followed_by_count': self.followed_by_count, 'intro': self.intro, 'following': self.following, 'followed_by': self.followed_by}
 
     def save_to_db(self):
         db.session.add(self)
