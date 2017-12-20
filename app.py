@@ -6,6 +6,7 @@ from security import authenticate, identity
 from resources.user import UserRegister, User
 from resources.post import Post, PostList
 from resources.saved import SavedUpdate
+from resources.theme import Theme, ThemeAdmin, ThemeAdminGet
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
@@ -24,6 +25,9 @@ api.add_resource(PostList, '/postlist/<string:mode>/<string:key>')
 api.add_resource(UserRegister, '/register')
 api.add_resource(User, '/user/<string:username>')
 api.add_resource(SavedUpdate, '/saved/<string:mode>/<string:postid>')
+api.add_resource(Theme, '/theme/<string:mode>/<int:index>')
+api.add_resource(ThemeAdmin, '/themeadmin')
+api.add_resource(ThemeAdminGet, '/adminget/<int:year>/<int:month>/<string:day>')
 
 if __name__ == '__main__':
     from db import db

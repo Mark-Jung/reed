@@ -127,3 +127,6 @@ class UserController():
         if len(wanted_list) != len(result):
             return "Inconsistent loading of users.", True 
         return "", result
+
+    def not_admin(input_user):
+        return not safe_str_cmp("mark", input_user.username)
