@@ -11,6 +11,7 @@ from resources.theme import Theme, ThemeAdmin, ThemeAdminGet
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=2592000)
 app.secret_key = 'reedforfun'
 api = Api(app)
 
