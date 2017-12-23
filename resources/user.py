@@ -37,13 +37,12 @@ class UserRegister(Resource):
     def post(self):
         data = UserRegister.parser.parse_args()
 
-        if UserModel.find_by_username(data['username']):
-            return {"message":"A user with that name already exists"}, 400
+        error_message, status = UserController.create_user(data['username'], data['password'], data['question'], data['answer'], data['intro'])
 
-        user = UserModel(data['username'], data['password'], data['question'], data['answer'], data['intro'])
-        user.save_to_db()
+        if error_message:
+            return {"message": error_message}, status
 
-        return {"message": "User created successfully."}, 201
+        return {"message": "Success!"}, 201 
 
 class User(Resource):
 
@@ -61,11 +60,11 @@ class User(Resource):
    
     @jwt_required()
     def get(self, username):
-        target_user = UserModel.find_by_username(username)
-        if target_user:
-            return {"user": target_user.json()}
+        error_message, response = UserController.find_by_username(username)
+        if error_message:
+            return {"message": error_message} 
         else:
-            return {"message": "A user with that username does not exist"}, 400
+            return {"user": response.json()}, 400
 
     @jwt_required()
     def put(self, username):
@@ -81,5 +80,3 @@ class User(Resource):
         elif not error_message and type(myfault) is list:
             return myfault, 200
 
-        
-        

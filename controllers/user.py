@@ -130,3 +130,24 @@ class UserController():
 
     def not_admin(input_user):
         return not safe_str_cmp("mark", input_user.username)
+
+    def find_by_username(username):
+        target_user = UserModel.find_by_username(username)
+        if target_user:
+            return "", target_user
+        else:
+            return "A user with that username doesn't exist.", None
+
+    def create_user(username, password, question, answer, intro):
+        if UserModel.find_by_username(username):
+            return "The username is already taken", 400
+        if not username or not password, or not question or not answer or not intro:
+            return "all fields are required", 400
+
+        try:
+            new_user = UserModel(username, password, question, answer, intro)
+            new_user.save_to_db()
+            return "", 201
+        except:
+            return "Error in creating and saving user", 500
+

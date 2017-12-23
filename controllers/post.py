@@ -1,6 +1,30 @@
 from models.post import PostModel
+from models.theme import ThemeModel
+from models.user import UserModel
 
 from werkzeug.security import safe_str_cmp
+
+class PostController():
+    
+    def create_post(theme, anonymity, username, content):
+        # check if that theme exists
+        # check if that username exists
+        # check if content is less than characters
+        if not ThemeModel.find_by_theme(theme):
+            return "The post's theme does not exist.", None
+        if not UserModel.find_by_id(username):
+            return "The writer is not a user", None
+        if len(content) > 150:
+            return "The content is too long", None
+
+        new_post = PostModel(theme, anonymity, username, content)
+        try:
+            new_post.save_to_db()
+        except:
+            return "Error saving to db", None
+
+        return ""
+
 
 class PostListController():
     # more complex functions that interact with the model for the resource to use
@@ -43,10 +67,4 @@ class PostListController():
         except:
             return "Error in getting most saved", None
 
-
-
-
-
-            
-        
 
