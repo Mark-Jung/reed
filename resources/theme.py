@@ -73,6 +73,7 @@ class ThemeAdminGet(Resource):
 
 class Theme(Resource):
 
+    @jwt_required()
     def get(self, mode, index):
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()

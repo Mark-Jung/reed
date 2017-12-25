@@ -3,4 +3,3 @@ Flask-Restful
 Flask-JWT
 Flask-SQLAlchemy
 psycopg2
-pytest-flask
