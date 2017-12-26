@@ -141,7 +141,7 @@ class UserController():
     def create_user(username, password, question, answer, intro):
         if UserModel.find_by_username(username):
             return "The username is already taken", 400
-        if not username or not password, or not question or not answer or not intro:
+        if not username or not password or not question or not answer or not intro:
             return "all fields are required", 400
 
         try:

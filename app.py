@@ -16,10 +16,6 @@ app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=2592000)
 app.secret_key = 'reedforfun'
 api = Api(app)
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 jwt = JWT(app, authenticate, identity)  # /auth jwt creates this endpoint
 
 api.add_resource(Post, '/posts')

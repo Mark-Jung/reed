@@ -57,6 +57,7 @@ class PostList(Resource):
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}
 
+    @jwt_required()
     def post(self, mode, key):
         data = PostList.parser.parse_args()
         error_message = "Wrong mode. Try id"
