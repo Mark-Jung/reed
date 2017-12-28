@@ -2,9 +2,9 @@ import os, sys
 import unittest
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 basedir = os.path.abspath(os.path.dirname(__file__))
- 
 from app import app
 from db import db
+import json
  
 TEST_DB = 'test.db'
  
@@ -134,7 +134,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(valid_register_response.status_code, 201)
         # login with unregistered credentials
         valid_login_response = self.app.post(
-                '/auth',
+                '/login',
                 data=dict(username="mark", password="101"),
                 follow_redirects=True
                 )
@@ -153,7 +153,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(valid_register_response.status_code, 201)
         # get valid token from valid login
         valid_login_response = self.app.post(
-                '/auth',
+                '/login',
                 data=dict(username="mark", password="1018"),
                 follow_redirects=True
                 )
@@ -176,7 +176,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(valid_register_response.status_code, 201)
         # get valid token from valid login
         valid_login_response = self.app.post(
-                '/auth',
+                '/login',
                 data=dict(username="mark", password="1018"),
                 follow_redirects=True
                 )

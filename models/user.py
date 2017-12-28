@@ -13,7 +13,7 @@ class UserModel(db.Model):
     saved = db.Column(db.String(250))
     saved_count = db.Column(db.Integer)
     written = db.relationship(
-            "PostModel", order_by="date_created", cascade="all, delete-orphan")
+            'PostModel', order_by="PostModel.date_created", cascade="all, delete-orphan")
     following = db.Column(db.String(250))
     following_count = db.Column(db.Integer)
     followed_by = db.Column(db.String(250))
@@ -30,7 +30,7 @@ class UserModel(db.Model):
         self.answer = answer
         self.saved_count = 0
         self.intro = intro 
-        
+       
     def password_is_valid(self, password):
         """
         Checks the password against it's hash to validates the user's password

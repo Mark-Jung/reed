@@ -3,7 +3,7 @@ from models.user import UserModel
 
 def login(username, password):
     user = UserModel.find_by_username(username)
-    if user and UserModel.password_is_valid(password):
+    if user and user.password_is_valid(password):
         return user.generate_token(user.id)
 
 def auth_by_token(token):
