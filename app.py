@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from security import authenticate, identity
 from resources.user import UserRegister, User
+from resources.auth import AuthLogin
 from resources.post import Post, PostList
 from resources.saved import SavedUpdate
 from resources.theme import Theme, ThemeAdmin, ThemeAdminGet
@@ -21,6 +22,7 @@ jwt = JWT(app, authenticate, identity)  # /auth jwt creates this endpoint
 api.add_resource(Post, '/posts')
 api.add_resource(PostList, '/postlist/<string:mode>/<string:key>')
 api.add_resource(UserRegister, '/register')
+api.add_resource(AuthLogin, '/login')
 api.add_resource(User, '/user/<string:username>')
 api.add_resource(SavedUpdate, '/saved/<string:mode>/<string:postid>')
 api.add_resource(Theme, '/theme/<string:mode>/<int:index>')

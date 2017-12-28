@@ -2,7 +2,6 @@ from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from werkzeug.security import safe_str_cmp
 
-from models.user import UserModel
 from controllers.user import UserController
 
 class UserRegister(Resource):

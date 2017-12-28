@@ -4,3 +4,4 @@ Flask-JWT
 Flask-SQLAlchemy
 psycopg2
 nose2
+flask-bcrypt

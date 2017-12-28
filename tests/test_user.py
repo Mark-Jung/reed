@@ -123,6 +123,68 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'This field is required and cannot be left blank.', response.data)
 
+    def test_invalid_login(self):
+        """login with different credentials than the registration"""
+        # valid registeration
+        valid_register_response = self.app.post(
+                '/register',
+                data=dict(username="mark", password="1018", question="who are you?", answer="i'm mark", intro="My name is ."),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_register_response.status_code, 201)
+        # login with unregistered credentials
+        valid_login_response = self.app.post(
+                '/auth',
+                data=dict(username="mark", password="101"),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_login_response.status_code, 401)
+
+    def test_valid_login(self):
+        """
+        valid login should give token and success message
+        """
+        # valid registration
+        valid_register_response = self.app.post(
+                '/register',
+                data=dict(username="mark", password="1018", question="who are you?", answer="i'm mark", intro="My name is ."),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_register_response.status_code, 201)
+        # get valid token from valid login
+        valid_login_response = self.app.post(
+                '/auth',
+                data=dict(username="mark", password="1018"),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_login_response.status_code, 200)
+        valid_response_data = json.loads(valid_login_response.data.decode())
+        self.assertEqual('Success!', valid_response_data['message'])
+        self.assertTrue(valid_response_data['access_token'])
+
+    def test_invalidation_of_old_token(self):
+        """
+        old token should only last 1 more day
+        INCOMPLETE. NEED TO FIND OUT HOW TO MANIPULATE TIME IN TESTING ENVIRONMENT
+        """
+        # valid registration
+        valid_register_response = self.app.post(
+                '/register',
+                data=dict(username="mark", password="1018", question="who are you?", answer="i'm mark", intro="My name is ."),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_register_response.status_code, 201)
+        # get valid token from valid login
+        valid_login_response = self.app.post(
+                '/auth',
+                data=dict(username="mark", password="1018"),
+                follow_redirects=True
+                )
+        self.assertEqual(valid_login_response.status_code, 200)
+        valid_response_data = json.loads(valid_login_response.data.decode())
+        self.assertEqual('Success!', valid_response_data['message'])
+
+
 if __name__ == "__main__":
     unittest.main()
 
