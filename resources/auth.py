@@ -28,8 +28,10 @@ class AuthLogin(Resource):
         data = AuthLogin.parser.parse_args()
         # response is in byte form, so must decode back to utf-8
         response = login(data["username"], data["password"])
+        if isinstance(response, bytes):
+            response = response.decode("utf-8")
         if response:
-            return {"access_token": response.decode("utf-8"), "message": "Success!"}, 200
+            return {"access_token": response, "message": "Success!"}, 200
         else:
             return {"message": "Invalid credentials. Register first."}, 401
 

@@ -157,8 +157,6 @@ class BasicTests(unittest.TestCase):
                 data=dict(username="mark", password="1018"),
                 follow_redirects=True
                 )
-
-        print(valid_login_response.data)
         
         self.assertEqual(valid_login_response.status_code, 200)
         valid_response_data = json.loads(valid_login_response.data.decode("utf-8"))
@@ -171,13 +169,8 @@ class BasicTests(unittest.TestCase):
                 content_type='application/json'
                 )
         get_response_data = json.loads(valid_user_get_response.data.decode())
-        if valid_user_get_response.status_code != 200:
-            print(get_response_data['message'])
-
         self.assertTrue(get_response_data['user'])
-        if get_response_data['user']:
-            print("hi")
-        #self.assertEqual(valid_user_get_response.status_code, 200)
+        self.assertEqual(valid_user_get_response.status_code, 200)
 
     def test_invalidation_of_old_token(self):
         """
@@ -191,7 +184,6 @@ class BasicTests(unittest.TestCase):
                 follow_redirects=True
                 )
         self.assertEqual(valid_register_response.status_code, 201)
-        """
         # get valid token from valid login
         valid_login_response = self.app.post(
                 '/login',
@@ -200,7 +192,6 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(valid_login_response.status_code, 200)
         valid_response_data = json.loads(valid_login_response.data.decode())
         self.assertEqual('Success!', valid_response_data['message'])
-        """
 
 
 if __name__ == "__main__":

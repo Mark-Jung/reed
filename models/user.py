@@ -66,12 +66,13 @@ class UserModel(db.Model):
                 'sub': _id
             }
             # create the byte string token using the payload and the SECRET key
-            jwt_string = jwt.encode(
+            jwt_bytes = jwt.encode(
                 payload,
-				'wjdrngusisthecreatorofreedforfun',
+                #'wjdrngusisthecreatorofreedforfun',
+                os.environ['SECRET'],
                 algorithm='HS256'
             )
-            return jwt_string
+            return jwt_bytes
         except Exception as e:
             # return an error in string format if an exception occurs
             return str(e)
@@ -85,12 +86,13 @@ class UserModel(db.Model):
         try:
             payload = jwt.decode(token, os.environ['SECRET'])
             payload['exp'] = datetime.utcnow() + timedelta(days=100)
-            jwt_string = jwt.encode(
+            jwt_bytes = jwt.encode(
                     payload,
-                    'wjdrngusisthecreatorofreedforfun',
+                    #'wjdrngusisthecreatorofreedforfun',
+                    os.environ['SECRET'],
                     algorithm='HS256'
                     )
-            return jwt_string
+            return jwt_bytes
         except Exception as e:
             return str(e)
 
@@ -99,7 +101,8 @@ class UserModel(db.Model):
         """Decodes the access token from the Authorization header."""
         try:
             # try to decode the token using our SECRET variable
-            payload = jwt.decode(token, 'wjdrngusisthecreatorofreedforfun')
+            #payload = jwt.decode(token, 'wjdrngusisthecreatorofreedforfun')
+            payload = jwt.decode(token, os.environ['SECRET'])
             return "", payload['sub']
         except jwt.ExpiredSignatureError:
             # the token is expired, return an error string
