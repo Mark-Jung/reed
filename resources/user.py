@@ -1,5 +1,7 @@
+from flask import request
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
+from securities.security import auth_by_token
 from werkzeug.security import safe_str_cmp
 
 from controllers.user import UserController
@@ -57,13 +59,22 @@ class User(Resource):
             help="This field is the optional payload for the request."
         )
    
-    @jwt_required()
     def get(self, username):
+        """
+        checks if the request is authorized. 
+        Then uses username to give the usermodel in json form.
+        """
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+
         error_message, response = UserController.find_by_username(username)
         if error_message:
-            return {"message": error_message} 
+            return {"message": error_message}, 400
         else:
-            return {"user": response.json()}, 400
+            return {"user": response.json()}
 
     @jwt_required()
     def put(self, username):

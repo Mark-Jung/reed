@@ -7,7 +7,7 @@ def login(username, password):
         return user.generate_token(user.id)
 
 def auth_by_token(token):
-    pass
+    return UserModel.decode_token(token)
 
 def identity(payload):
     user_id = payload['identity']

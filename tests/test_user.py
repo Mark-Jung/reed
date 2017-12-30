@@ -140,27 +140,42 @@ class BasicTests(unittest.TestCase):
                 )
         self.assertEqual(valid_login_response.status_code, 401)
 
-    def test_valid_login(self):
+    def test_valid_login_and_token(self):
         """
         valid login should give token and success message
         """
         # valid registration
         valid_register_response = self.app.post(
                 '/register',
-                data=dict(username="mark", password="1018", question="who are you?", answer="i'm mark", intro="My name is ."),
-                follow_redirects=True
+                data=json.dumps(dict(username="mark", password="1018", question="who are you?", answer="i'm mark", intro="My name is .")),
+                content_type='application/json'
                 )
         self.assertEqual(valid_register_response.status_code, 201)
         # get valid token from valid login
         valid_login_response = self.app.post(
                 '/login',
-                data=dict(username="mark", password="1018"),
-                follow_redirects=True
+                data={'username':'mark', 'password':'1018'},
+                content_type='application/json'
                 )
+        
         self.assertEqual(valid_login_response.status_code, 200)
-        valid_response_data = json.loads(valid_login_response.data.decode())
+        valid_response_data = json.loads(valid_login_response.data.decode("utf-8"))
         self.assertEqual('Success!', valid_response_data['message'])
         self.assertTrue(valid_response_data['access_token'])
+        access_token = valid_response_data['access_token']
+        valid_user_get_response = self.app.get(
+                '/user/mark',
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json'
+                )
+        get_response_data = json.loads(valid_user_get_response.data.decode())
+        if valid_user_get_response.status_code != 200:
+            print(get_response_data['message'])
+
+        self.assertTrue(get_response_data['user'])
+        if get_response_data['user']:
+            print("hi")
+        #self.assertEqual(valid_user_get_response.status_code, 200)
 
     def test_invalidation_of_old_token(self):
         """
@@ -174,15 +189,16 @@ class BasicTests(unittest.TestCase):
                 follow_redirects=True
                 )
         self.assertEqual(valid_register_response.status_code, 201)
+        """
         # get valid token from valid login
         valid_login_response = self.app.post(
                 '/login',
                 data=dict(username="mark", password="1018"),
-                follow_redirects=True
                 )
         self.assertEqual(valid_login_response.status_code, 200)
         valid_response_data = json.loads(valid_login_response.data.decode())
         self.assertEqual('Success!', valid_response_data['message'])
+        """
 
 
 if __name__ == "__main__":

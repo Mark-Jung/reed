@@ -1,6 +1,7 @@
 import os
 from db import db
 from flask_bcrypt import Bcrypt
+from freezegun import freeze_time
 import jwt
 from datetime import datetime, timedelta
 
@@ -67,7 +68,7 @@ class UserModel(db.Model):
             # create the byte string token using the payload and the SECRET key
             jwt_string = jwt.encode(
                 payload,
-				os.environ['SECRET'],
+				'wjdrngusisthecreatorofreedforfun',
                 algorithm='HS256'
             )
             return jwt_string
@@ -86,7 +87,7 @@ class UserModel(db.Model):
             payload['exp'] = datetime.utcnow() + timedelta(days=100)
             jwt_string = jwt.encode(
                     payload,
-                    os.environ['SECRET'],
+                    'wjdrngusisthecreatorofreedforfun',
                     algorithm='HS256'
                     )
             return jwt_string
@@ -98,12 +99,12 @@ class UserModel(db.Model):
         """Decodes the access token from the Authorization header."""
         try:
             # try to decode the token using our SECRET variable
-            payload = jwt.decode(token, os.environ['SECRET'])
-            return payload['sub']
+            payload = jwt.decode(token, 'wjdrngusisthecreatorofreedforfun')
+            return "", payload['sub']
         except jwt.ExpiredSignatureError:
             # the token is expired, return an error string
-            return "Expired token. Please login to get a new token"
+            return "Expired token. Please login to get a new token", None
         except jwt.InvalidTokenError:
             # the token is invalid, return an error string
-            return "Invalid token. Please register or login"
+            return "Invalid token. Please register or login", None
 
