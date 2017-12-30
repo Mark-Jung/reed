@@ -154,9 +154,11 @@ class BasicTests(unittest.TestCase):
         # get valid token from valid login
         valid_login_response = self.app.post(
                 '/login',
-                data={'username':'mark', 'password':'1018'},
-                content_type='application/json'
+                data=dict(username="mark", password="1018"),
+                follow_redirects=True
                 )
+
+        print(valid_login_response.data)
         
         self.assertEqual(valid_login_response.status_code, 200)
         valid_response_data = json.loads(valid_login_response.data.decode("utf-8"))
