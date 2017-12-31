@@ -5,6 +5,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 from app import app
 from db import db
 import json
+from datetime import datetime, timedelta
+from freezegun import freeze_time
  
 TEST_DB = 'test.db'
  
@@ -174,8 +176,7 @@ class BasicTests(unittest.TestCase):
 
     def test_invalidation_of_old_token(self):
         """
-        old token should only last 1 more day
-        INCOMPLETE. NEED TO FIND OUT HOW TO MANIPULATE TIME IN TESTING ENVIRONMENT
+        token should last 30 days
         """
         # valid registration
         valid_register_response = self.app.post(
@@ -192,6 +193,32 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(valid_login_response.status_code, 200)
         valid_response_data = json.loads(valid_login_response.data.decode())
         self.assertEqual('Success!', valid_response_data['message'])
+        self.assertTrue(valid_response_data['access_token'])
+        access_token = valid_response_data['access_token']
+        valid_user_get_response = self.app.get(
+                '/user/mark',
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json'
+                )
+        get_response_data = json.loads(valid_user_get_response.data.decode())
+        self.assertTrue(get_response_data['user'])
+        self.assertEqual(valid_user_get_response.status_code, 200)
+        time_now = datetime.now()
+        expiration_date = time_now + timedelta(days=30) + timedelta(hours=1)
+        assert time_now != expiration_date
+        # turn time away and see that token expires
+        with freeze_time(expiration_date):
+            invalid_user_get_response = self.app.get(
+                    '/user/mark',
+                    headers=dict(Authorization="Bearer " + access_token),
+                    content_type='application/json'
+                    )
+            get_response_data = json.loads(invalid_user_get_response.data.decode())
+            self.assertTrue(get_response_data['message'])
+            self.assertTrue(get_response_data['message'], "Please login to get a new token")
+            self.assertEqual(invalid_user_get_response.status_code, 401)
+
+
 
 
 if __name__ == "__main__":
