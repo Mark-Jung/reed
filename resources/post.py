@@ -30,7 +30,7 @@ class Post(Resource):
     def post(self):
         data = Post.parser.parse_args()
 
-        auth_header = request.headers.get('Authorizaton')
+        auth_header = request.headers.get('Authorization')
         if auth_header:
             access_token = auth_header.split(" ")[1]
         else:

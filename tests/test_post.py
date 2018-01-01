@@ -97,11 +97,11 @@ class BasicTests(unittest.TestCase):
         post_response = self.app.post(
                 '/posts',
                 data=dict(theme="love", anonymity="True", content="started with the bye and ended with a wrong hi"),
-                headers=dict(Authorization="Bearer " + access_token),
+                headers=dict(Authorization="Bearer " + access_token)
                 )
-        #self.assertEqual(post_response.status_code, 201)
+        self.assertEqual(post_response.status_code, 201)
         post_data = json.loads(post_response.data.decode())
-        print(post_data['message'])
+        self.assertEqual('Success!', post_data['message'])
 
         # retrieve post by theme and check result
 

@@ -11,8 +11,8 @@ class PostController():
         # check if that username exists
         # check if content is less than characters
         writer = UserModel.find_by_id(writer_id)
-        if ThemeModel.find_by_theme(theme):
-            return "The post's theme already exists.", None
+        if not ThemeModel.find_by_theme(theme):
+            return "The post's theme doesn't exist.", None
         if not writer:
             return "The writer is not a user", None
         if len(content) > 150:
