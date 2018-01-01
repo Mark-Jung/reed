@@ -128,8 +128,12 @@ class UserController():
             return "Inconsistent loading of users.", True 
         return "", result
 
-    def not_admin(input_user):
-        return not safe_str_cmp("mark", input_user.username)
+    def not_admin(input_user_id):
+        """
+        True if not admin,
+        False if admin
+        """
+        return not safe_str_cmp("mark", UserModel.find_by_id(input_user_id).username)
 
     def find_by_username(username):
         target_user = UserModel.find_by_username(username)

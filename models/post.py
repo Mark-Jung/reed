@@ -18,7 +18,10 @@ class PostModel(db.Model):
 
     def __init__(self, theme, anonymity, writer, content):
         self.theme = theme
-        self.anonymity = anonymity
+        if anonymity == "True":
+            self.anonymity = True
+        else:
+            self.anonymity = False
         self.writer = writer 
         self.content = content
         self.saved = 0
@@ -39,8 +42,8 @@ class PostModel(db.Model):
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
-    def filter_by_most_saved(cls):
-        return cls.query.order_by(desc(PostModel.saved)).all()
+    def filter_by_most_saved(cls, theme):
+        return cls.query.filter_by(theme=theme).all().order_by(desc(PostModel.saved)).all()
 
     def save_to_db(self):
         db.session.add(self)

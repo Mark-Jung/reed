@@ -65,7 +65,10 @@ class User(Resource):
         Then uses username to give the usermodel in json form.
         """
         auth_header = request.headers.get('Authorization')
-        access_token = auth_header.split(" ")[1]
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
         error, client_id = auth_by_token(access_token)
         if error:
             return {"message": error}, 401
