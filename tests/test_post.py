@@ -104,8 +104,46 @@ class BasicTests(unittest.TestCase):
         self.assertEqual('Success!', post_data['message'])
 
         # retrieve post by theme and check result
+        get_by_theme = self.app.get(
+                '/postlist/theme/love',
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(get_by_theme.status_code, 200)
+        get_by_theme_data = json.loads(get_by_theme.data.decode())
+        self.assertEqual(1, get_by_theme_data['response'][0]['writer_id'])
+        self.assertEqual('mark', get_by_theme_data['response'][0]['writer_username'])
+        self.assertEqual('started with the bye and ended with a wrong hi', get_by_theme_data['response'][0]['content'])
+        self.assertEqual(0, get_by_theme_data['response'][0]['saved'])
 
- 
+
+        # retrieve post by user and check result
+        get_by_theme = self.app.get(
+                '/postlist/user/1',
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(get_by_theme.status_code, 200)
+        get_by_theme_data = json.loads(get_by_theme.data.decode())
+        if get_by_theme.status_code != 200:
+            print(get_by_theme_data['message'])
+        self.assertEqual(1, get_by_theme_data['response'][0]['writer_id'])
+        self.assertEqual('mark', get_by_theme_data['response'][0]['writer_username'])
+        self.assertEqual('started with the bye and ended with a wrong hi', get_by_theme_data['response'][0]['content'])
+        self.assertEqual(0, get_by_theme_data['response'][0]['saved'])
+    
+        # retrieve post by saved and check result
+        get_by_theme = self.app.get(
+                '/postlist/saved/love',
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        # self.assertEqual(get_by_theme.status_code, 200)
+        get_by_theme_data = json.loads(get_by_theme.data.decode())
+        if get_by_theme.status_code != 200:
+            print(get_by_theme_data['message'])
+        self.assertEqual(1, get_by_theme_data['response'][0]['writer_id'])
+        self.assertEqual('mark', get_by_theme_data['response'][0]['writer_username'])
+        self.assertEqual('started with the bye and ended with a wrong hi', get_by_theme_data['response'][0]['content'])
+        self.assertEqual(0, get_by_theme_data['response'][0]['saved'])
+    
 
 
 if __name__ == "__main__":

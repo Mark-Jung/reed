@@ -19,7 +19,7 @@ class PostController():
             return "The content is too long", None
 
         try:
-            new_post = PostModel(theme, anonymity, writer.username, content)
+            new_post = PostModel(theme, anonymity, writer_id, content)
             new_post.save_to_db()
         except:
             return "Error saving to db", None
@@ -45,14 +45,13 @@ class PostListController():
             return "Inconsistent loading of posts", None
         return "", result
 
-    def filter_by_username(username):
-        if not username:
-            return "Name is needed", None
-        # check if name is only comprised of numbers and spaces
-        username_nospace = username.replace(" ", "")
-        if not username_nospace.isalnum():
-            return "Username is only made of alphabets, numbers, and spaces", None
-        return "", PostModel.filter_by_username(username)
+    def filter_by_writer_id(_id):
+        if not _id:
+            return "ID of the writer is needed", None
+        if not UserModel.find_by_id(_id):
+            return "A user with that id does not exist", None
+
+        return "", PostModel.filter_by_writer_id(int(_id))
 
     def filter_by_theme(theme):
         """
@@ -78,9 +77,6 @@ class PostListController():
         theme_nospace = theme.replace(" ", "")
         if not theme_nospace.isalnum():
             return "theme should only be consisted of alphabets, numbers, and spaces", None
-        try:
-            return "", PostModel.filter_by_most_saved(theme)
-        except:
-            return "Error in getting most saved", None
+        return "", PostModel.filter_by_most_saved(theme)
 
 

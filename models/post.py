@@ -14,24 +14,24 @@ class PostModel(db.Model):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    writer = db.Column(db.Integer, db.ForeignKey(UserModel.id))
+    writer_id = db.Column(db.Integer, db.ForeignKey(UserModel.id))
 
-    def __init__(self, theme, anonymity, writer, content):
+    def __init__(self, theme, anonymity, writer_id, content):
         self.theme = theme
         if anonymity == "True":
             self.anonymity = True
         else:
             self.anonymity = False
-        self.writer = writer 
+        self.writer_id = writer_id
         self.content = content
         self.saved = 0
 
     def json(self):
-        return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_username': UserModel.find_by_id(self.created_by).username, 'writer_id': self.writer, 'content': self.content, 'saved': self.saved}
+        return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved}
 
     @classmethod
-    def filter_by_writer(cls, writer):
-        return cls.query.filter_by(writer=writer).all()
+    def filter_by_writer_id(cls, writer_id):
+        return cls.query.filter_by(writer_id=writer_id).all()
 
     @classmethod
     def filter_by_theme(cls, theme):
@@ -43,7 +43,7 @@ class PostModel(db.Model):
 
     @classmethod
     def filter_by_most_saved(cls, theme):
-        return cls.query.filter_by(theme=theme).all().order_by(desc(PostModel.saved)).all()
+        return cls.query.filter_by(theme=theme).order_by(desc(PostModel.saved)).all()
 
     def save_to_db(self):
         db.session.add(self)

@@ -50,6 +50,8 @@ class PostList(Resource):
     """
     postlist/<mode>/<key>
     get: retrieves post(s) by theme, user, or by most saved
+    post: retrievs posts by list of ids given
+
     """
     parser = reqparse.RequestParser()
     parser.add_argument('wanted',
@@ -59,14 +61,23 @@ class PostList(Resource):
     )
 
     def get(self, mode, key):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+
         error_message = ""
 
         if safe_str_cmp(mode, 'theme'):
             error_message, response = PostListController.filter_by_theme(key)
         elif safe_str_cmp(mode, 'user'):
-            error_message, response = PostListController.filter_by_username(key)
+            error_message, response = PostListController.filter_by_writer_id(key)
         elif safe_str_cmp(mode, 'saved'):
-            error_message, response = PostListController.filter_by_most_saved()
+            error_message, response = PostListController.filter_by_most_saved(key)
         else:
             error_message = "Wrong mode. Try theme, user, or saved"
 
