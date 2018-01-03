@@ -59,10 +59,12 @@ class PostListController():
         returns all the post models for that theme
         """
         if not theme:
-            return "theme is needed", None
+            return "Theme is needed", None
         theme_nospace = theme.replace(" ", "")
         if not theme_nospace.isalnum():
-            return "theme should only be consisted of alphabets, numbers, and spaces", None
+            return "Theme should only be consisted of alphabets, numbers, and spaces", None
+        if not ThemeModel.find_by_theme(theme):
+            return "Theme doesn't exist.", None
         try:
             return "", PostModel.filter_by_theme(theme)
         except:
@@ -73,10 +75,10 @@ class PostListController():
         checks if input is valid by alphabet or number, and not blank
         """
         if not theme:
-            return "theme is needed", None
+            return "Theme is needed", None
         theme_nospace = theme.replace(" ", "")
         if not theme_nospace.isalnum():
-            return "theme should only be consisted of alphabets, numbers, and spaces", None
+            return "Theme should only be consisted of alphabets, numbers, and spaces", None
         return "", PostModel.filter_by_most_saved(theme)
 
 
