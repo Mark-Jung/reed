@@ -86,18 +86,25 @@ class PostList(Resource):
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}
 
-    @jwt_required()
     def post(self, mode, key):
         data = PostList.parser.parse_args()
-        error_message = "Wrong mode. Try id"
+
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+
+        error_message = "Wrong mode or key."
 
         if safe_str_cmp(mode, 'id') and safe_str_cmp(key, "please"):
             error_message, response = PostListController.filter_by_id(data['wanted'])
 
         if error_message:
             return {"message": error_message}, 400
-        if response[0] is None:
-            return {"message": "First id requested or the id requested is invalid"}
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}
 

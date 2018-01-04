@@ -211,7 +211,95 @@ class PostTests(unittest.TestCase):
         self.assertEqual(bad_get.status_code, 400)
         self.assertTrue(bad_get_data['message'])
 
+    def test_get_post_by_id(self):
+        """
+        test the post endpoint, which is actually a get method but with the list of ids
+        """
+        register_response = self.app.post(
+                '/register',
+                data=dict(username="mark", password="1018", question="who are you", answer="I'm mark", intro="My name is ."),
+                )
+        self.assertEqual(register_response.status_code, 201)
 
+        # login as mark
+        login_response = self.app.post(
+                '/login',
+                data=dict(username="mark", password="1018")
+                )
+        self.assertEqual(login_response.status_code, 200)
+        login_response_data = json.loads(login_response.data.decode())
+        self.assertEqual('Success!', login_response_data['message'])
+        access_token = login_response_data['access_token']
+        self.assertTrue(access_token)
+
+        # create theme
+        theme_response = self.app.post(
+                '/themeadmin',
+                data=dict(theme="love", theme_inspire="moi", theme_author="mark", release_time="2018-1-20 6:30:00"),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(theme_response.status_code, 201)
+        theme_data = json.loads(theme_response.data.decode())
+        self.assertEqual('Success!', theme_data['message'])
+        
+        # upload post
+        post_response = self.app.post(
+                '/posts',
+                data=dict(theme="love", anonymity="True", content="started with the bye and ended with a wrong hi"),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(post_response.status_code, 201)
+        post_data = json.loads(post_response.data.decode())
+        self.assertEqual('Success!', post_data['message'])
+
+        # retrieve post by post method(list of ids)
+        get_response = self.app.post(
+                '/postlist/id/please',
+                data=dict(wanted='1'),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(get_response.status_code, 200)
+        get_data = json.loads(get_response.data.decode())
+        self.assertEqual(1, get_data['response'][0]['writer_id'])
+        self.assertEqual('mark', get_data['response'][0]['writer_username'])
+        self.assertEqual('started with the bye and ended with a wrong hi', get_data['response'][0]['content'])
+        self.assertEqual(0, get_data['response'][0]['saved'])
+
+        # send bad method for post - bad keyword 1.0
+        get_response = self.app.post(
+                '/postlist/id/wtf',
+                data=dict(wanted='1'),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertNotEqual(get_response.status_code, 200)
+        self.assertEqual(get_response.status_code, 400)
+        get_data = json.loads(get_response.data.decode())
+        self.assertEqual("Wrong mode or key.", get_data['message'])
+
+        # send bad method for post - bad keyword 1.1
+        get_response = self.app.post(
+                '/postlist/ixd/please',
+                data=dict(wanted='1'),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertNotEqual(get_response.status_code, 200)
+        self.assertEqual(get_response.status_code, 400)
+        get_data = json.loads(get_response.data.decode())
+        self.assertEqual("Wrong mode or key.", get_data['message'])
+
+        # send bad payload for post 
+        get_response = self.app.post(
+                '/postlist/id/please',
+                data=dict(wanted='34 1'),
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        self.assertEqual(get_response.status_code, 200)
+        get_data = json.loads(get_response.data.decode())
+        self.assertEqual(None, get_data['response'][0])
+        self.assertEqual(1, get_data['response'][1]['writer_id'])
+        self.assertEqual('mark', get_data['response'][1]['writer_username'])
+        self.assertEqual('started with the bye and ended with a wrong hi', get_data['response'][1]['content'])
+        self.assertEqual(0, get_data['response'][1]['saved'])
 
 if __name__ == "__main__":
     unittest.main()
