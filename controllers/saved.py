@@ -24,9 +24,9 @@ class SavedController():
         target_post.save_to_db()
         return ""
     
-    def append_saved(postid, username):
+    def append_saved(postid, userid):
         saved_list = []
-        target_user = UserModel.find_by_username(username)
+        target_user = UserModel.find_by_id(userid)
         #check if post id is valid
         target_post = PostModel.find_by_id(postid)
         if target_post is None:
@@ -36,7 +36,7 @@ class SavedController():
             saved_list = target_user.saved.split(' ')
             for each in saved_list:
                 if postid == each:
-                    return "cannot add same posts multiple times"
+                    return "Already saved that post."
         #check that saved count is within limit
         if target_user.saved_count > 29:
             return "Reached maximum capacity for saving posts"
@@ -47,8 +47,8 @@ class SavedController():
         target_user.save_to_db()
         return ""
 
-    def delete_saved(postid, username):
-        target_user = UserModel.find_by_username(username)
+    def delete_saved(postid, userid):
+        target_user = UserModel.find_by_id(userid)
         #check if post id is valid
         target_post = PostModel.find_by_id(postid)
         if target_post is None:

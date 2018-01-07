@@ -33,31 +33,9 @@ class BasicTests(unittest.TestCase):
     def tearDown(self):
         pass
  
-    ########################
-    #### helper methods ####
-    ########################
- 
-    def register(self, username, password, question, answer, intro):
-        return self.app.post(
-            '/register',
-            data=dict(username=username, password=password, question=question, answer=answer, intro=intro),
-            follow_redirects=True
-        )
- 
-    def login(self, email, password):
-        return self.app.post(
-            '/auth',
-            data=dict(username=username, password=password),
-            follow_redirects=True
-        )
- 
     ###############
     #### tests ####
     ###############
- 
-    def test_main_page(self):
-        response = self.app.get('/', follow_redirects=True)
-        self.assertEqual(response.status_code, 404)
 
     def test_valid_create_user(self):
         response = self.app.post(
