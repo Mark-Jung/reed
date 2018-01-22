@@ -8,7 +8,7 @@ class PostModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
-    content = db.Column(db.String(200))
+    content = db.Column(db.String(248))
     saved = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
