@@ -74,26 +74,15 @@ class SavedTests(unittest.TestCase):
     ###############
     #### tests ####
     ###############
-    """
-    need to test: 
-        Done - appending a post to saved list of user, and incrementing saved count of post
-        Done - tests deleting a post from the saved list of user, and decrementing saved count of post
-        Done - invalid post number doesn't get deleted or added
-        Done - only valid modes work
-    """
     def test_valid_saved_append_delete(self):
         """
-        tests appending a post to saved list of user, and incrementing saved count of post
-
+        tests appending a post to saved list of user, and incrementing
             1. Create two users
             2. Create a theme for the post
             3. Make a post written by the second user
             4. Add that post to saved
             5. Check by getting User and Post info that it has been added and incremented
-
-
-        tests deleting a post from the saved list of user, and decrementing saved count of post
-
+        tests deleting a post from the saved list of user, and decrementing
             1. Delete post added.
             2. Check list and count that they are empty and 0
         """
@@ -113,7 +102,7 @@ class SavedTests(unittest.TestCase):
         access_token_mark = login_response_data['access_token']
         self.assertTrue(access_token_mark)
 
-        # login as san
+        # login as mark
         login_response = self.login('san', '0')
         self.assertEqual(login_response.status_code, 200)
         login_response_data = json.loads(login_response.data.decode())
@@ -138,7 +127,7 @@ class SavedTests(unittest.TestCase):
         # get post and check 'saved' count starts as 0
         get_by_theme = self.app.get(
                 '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
+                headers=dict(Authorization="Bearer " + access_token_san)
                 )
         self.assertEqual(get_by_theme.status_code, 200)
         get_by_theme_data = json.loads(get_by_theme.data.decode())
@@ -221,134 +210,6 @@ class SavedTests(unittest.TestCase):
         mark_data = json.loads(user_get.data.decode())['user']
         mark_saved_ls = mark_data['saved'].split(' ')
         self.assertEqual('', mark_saved_ls[0])
-
-    def test_invalid_request_data(self):
-        """
-        test invalid post id
-            1. if the id doesn't exist
-            2. if the id is not a number
-
-        test invalid mode message
-            1. if the message is not one of the promised modes
-        """
-        # register user mark 
-        register_response = self.register('mark', '1018', 'who u?', 'me', 'hello')
-        self.assertEqual(register_response.status_code, 201)
-
-        # login as mark
-        login_response = self.login('mark', '1018')
-        self.assertEqual(login_response.status_code, 200)
-        login_response_data = json.loads(login_response.data.decode())
-        self.assertEqual('Success!', login_response_data['message'])
-        access_token_mark = login_response_data['access_token']
-        self.assertTrue(access_token_mark)
-
-        # create theme
-        theme_response = self.create_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
-        self.assertEqual(theme_response.status_code, 201)
-        theme_data = json.loads(theme_response.data.decode())
-        self.assertEqual('Success!', theme_data['message'])
-
-        # make post by mark
-        post_response = self.create_post(access_token_mark, 'love', 'False', 'i love rtvf')
-        self.assertEqual(post_response.status_code, 201)
-        post_response_data = json.loads(post_response.data.decode())
-        self.assertEqual('Success!', post_response_data['message'])
-
-        # get post and check 'saved' count starts as 0
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-
-        # try incrementing the 'saved' of a post that doesn't exist - id is invalid number
-        not_valid_post = 12
-        self.assertNotEqual(not_valid_post, mark_post['id'])
-        # invalid request
-        invalid_append = self.update_saved('append', not_valid_post, access_token_mark)
-
-        # check invalid request didn't affect db
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-
-        self.assertEqual(invalid_append.status_code, 500)
-
-        # invalid request
-        invalid_delete = self.update_saved('delete', not_valid_post, access_token_mark)
-        # check invalid request didn't affect db
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-
-        self.assertEqual(invalid_delete.status_code, 500)
-
-        # try incrementing the 'saved' of a post that doesn't exist - id is not a number
-        not_valid_post = 'asdf'
-        self.assertNotEqual(not_valid_post, mark_post['id'])
-        #invalid request
-        invalid_append = self.update_saved('append', not_valid_post, access_token_mark)
-        # check invalid request didn't affect db
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-
-        self.assertEqual(invalid_append.status_code, 500)
-
-        # invalid request
-        invalid_delete = self.update_saved('delete', not_valid_post, access_token_mark)
-        # check invalid request didn't affect db
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-
-        self.assertEqual(invalid_delete.status_code, 500)
-
-        # try sending invalid modes - blank string
-        invalid_update = self.update_saved('', not_valid_post, access_token_mark)
-        # check invalid request didn't affect db
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_mark)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        mark_post = get_by_theme_data['response'][0]
-        self.assertEqual(mark_post['writer_username'], 'mark')
-        self.assertEqual(mark_post['saved'], 0)
-        
-        self.assertEqual(invalid_update.status_code, 400)
-
-        
 
         
 

@@ -1,0 +1,320 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Coverage report</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="coverage_html.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(coverage.index_ready);
+    </script>
+</head>
+<body class="indexfile">
+
+<div id="header">
+    <div class="content">
+        <h1>Coverage report:
+            <span class="pc_cov">66%</span>
+        </h1>
+
+        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
+        <form id="filter_container">
+            <input id="filter" type="text" value="" placeholder="filter..." />
+        </form>
+    </div>
+</div>
+
+<div class="help_panel">
+    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
+    <p class="legend">Hot-keys on this page</p>
+    <div>
+    <p class="keyhelp">
+        <span class="key">n</span>
+        <span class="key">s</span>
+        <span class="key">m</span>
+        <span class="key">x</span>
+        
+        <span class="key">b</span>
+        <span class="key">p</span>
+        
+        <span class="key">c</span> &nbsp; change column sorting
+    </p>
+    </div>
+</div>
+
+<div id="index">
+    <table class="index">
+        <thead>
+            
+            <tr class="tablehead" title="Click to sort">
+                <th class="name left headerSortDown shortkey_n">Module</th>
+                <th class="shortkey_s">statements</th>
+                <th class="shortkey_m">missing</th>
+                <th class="shortkey_x">excluded</th>
+                
+                <th class="shortkey_b">branches</th>
+                <th class="shortkey_p">partial</th>
+                
+                <th class="right shortkey_c">coverage</th>
+            </tr>
+        </thead>
+        
+        <tfoot>
+            <tr class="total">
+                <td class="name left">Total</td>
+                <td>1071</td>
+                <td>293</td>
+                <td>10</td>
+                
+                <td>250</td>
+                <td>48</td>
+                
+                <td class="right" data-ratio="870 1321">66%</td>
+            </tr>
+        </tfoot>
+        <tbody>
+            
+            <tr class="file">
+                <td class="name left"><a href="app_py.html">app.py</a></td>
+                <td>26</td>
+                <td>0</td>
+                <td>4</td>
+                
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="26 26">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="controllers_post_py.html">controllers/post.py</a></td>
+                <td>58</td>
+                <td>15</td>
+                <td>0</td>
+                
+                <td>28</td>
+                <td>11</td>
+                
+                <td class="right" data-ratio="60 86">70%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="controllers_saved_py.html">controllers/saved.py</a></td>
+                <td>54</td>
+                <td>8</td>
+                <td>0</td>
+                
+                <td>24</td>
+                <td>11</td>
+                
+                <td class="right" data-ratio="59 78">76%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="controllers_theme_py.html">controllers/theme.py</a></td>
+                <td>73</td>
+                <td>57</td>
+                <td>0</td>
+                
+                <td>26</td>
+                <td>3</td>
+                
+                <td class="right" data-ratio="19 99">19%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="controllers_user_py.html">controllers/user.py</a></td>
+                <td>131</td>
+                <td>108</td>
+                <td>0</td>
+                
+                <td>60</td>
+                <td>2</td>
+                
+                <td class="right" data-ratio="27 191">14%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="models_post_py.html">models/post.py</a></td>
+                <td>54</td>
+                <td>17</td>
+                <td>0</td>
+                
+                <td>4</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="39 58">67%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="models_theme_py.html">models/theme.py</a></td>
+                <td>35</td>
+                <td>6</td>
+                <td>0</td>
+                
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="29 35">83%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="models_user_py.html">models/user.py</a></td>
+                <td>62</td>
+                <td>11</td>
+                <td>0</td>
+                
+                <td>2</td>
+                <td>1</td>
+                
+                <td class="right" data-ratio="52 64">81%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="resources_auth_py.html">resources/auth.py</a></td>
+                <td>16</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td>4</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="20 20">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="resources_post_py.html">resources/post.py</a></td>
+                <td>67</td>
+                <td>12</td>
+                <td>0</td>
+                
+                <td>32</td>
+                <td>7</td>
+                
+                <td class="right" data-ratio="78 99">79%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="resources_saved_py.html">resources/saved.py</a></td>
+                <td>38</td>
+                <td>6</td>
+                <td>0</td>
+                
+                <td>16</td>
+                <td>6</td>
+                
+                <td class="right" data-ratio="42 54">78%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="resources_theme_py.html">resources/theme.py</a></td>
+                <td>59</td>
+                <td>29</td>
+                <td>0</td>
+                
+                <td>32</td>
+                <td>4</td>
+                
+                <td class="right" data-ratio="36 91">40%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="resources_user_py.html">resources/user.py</a></td>
+                <td>47</td>
+                <td>13</td>
+                <td>0</td>
+                
+                <td>16</td>
+                <td>2</td>
+                
+                <td class="right" data-ratio="40 63">63%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="securities_security_py.html">securities/security.py</a></td>
+                <td>11</td>
+                <td>2</td>
+                <td>0</td>
+                
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="11 13">85%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="security_py.html">security.py</a></td>
+                <td>9</td>
+                <td>5</td>
+                <td>0</td>
+                
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="4 11">36%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="tests_test_post_py.html">tests/test_post.py</a></td>
+                <td>139</td>
+                <td>4</td>
+                <td>2</td>
+                
+                <td>2</td>
+                <td>1</td>
+                
+                <td class="right" data-ratio="136 141">96%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="tests_test_saved_py.html">tests/test_saved.py</a></td>
+                <td>105</td>
+                <td>0</td>
+                <td>2</td>
+                
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="105 105">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="tests_test_user_py.html">tests/test_user.py</a></td>
+                <td>87</td>
+                <td>0</td>
+                <td>2</td>
+                
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="87 87">100%</td>
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <p id="no_rows">
+        No items found using the specified filter.
+    </p>
+</div>
+
+<div id="footer">
+    <div class="content">
+        <p>
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.4.2</a>,
+            created at 2018-01-08 07:01
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

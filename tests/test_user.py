@@ -182,7 +182,7 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(get_response_data['user'])
         self.assertEqual(valid_user_get_response.status_code, 200)
         time_now = datetime.now()
-        expiration_date = time_now + timedelta(days=30) + timedelta(hours=1)
+        expiration_date = time_now + timedelta(days=31) + timedelta(hours=1)
         assert time_now != expiration_date
         # turn time away and see that token expires
         with freeze_time(expiration_date):
