@@ -11,4 +11,6 @@ xcode(front-end), brew, pip, virtualenv,
 6. On your commandline, write: virtualenv env --python=python3.6
 7. On your commandline, write: source env/bin/activate
 8. Try typing 'python', and if you can see that it's python version 3.6, you're good to go.
-9. gj. 
+9. On your commandline, write: pip install -r requirements.txt
+10. Ask mark for his secret env variable
+11. run 'nose2' and see if all of the tests pass. If any doen't pass, alert mark IMMEDIATELY. 
