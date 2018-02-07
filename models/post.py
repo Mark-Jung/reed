@@ -9,6 +9,7 @@ class PostModel(db.Model):
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
     content = db.Column(db.String(248))
+    liked = db.Column(db.Integer)
     saved = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(

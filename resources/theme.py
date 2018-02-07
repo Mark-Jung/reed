@@ -45,9 +45,8 @@ class ThemeAdmin(Resource):
         error, client_id = auth_by_token(access_token)
         if error:
             return {"message": error}, 401
-
         if UserController.not_admin(client_id):
-            return {"message": "Only the priveleged can come here. Get out peasant."}, 400
+            return {"message": "Only the priveleged can come here. Get out peasant."}, 401
 
         data = ThemeAdmin.parser.parse_args()
         error_message = ThemeController.create_theme(data["release_time"], data["theme"], data["theme_inspire"], data["theme_author"]) 
@@ -56,24 +55,39 @@ class ThemeAdmin(Resource):
         else:
             return {"message": "Success!"}, 201
 
-    @jwt_required()
     def put(self):
-        if UserController.not_admin():
-            return {"message": "Only the priveleged can come here. Get out peasant."}, 400
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+        if UserController.not_admin(client_id):
+            return {"message": "Only the priveleged can come here. Get out peasant."}, 401
 
         data = ThemeAdmin.parser.parse_args()
         error_message = ThemeController.update_theme(data["release_time"], data["theme"], data["theme_inspire"], data["theme_author"])
         if error_message:
             return {"message": error_message}, 400
         else:
-            return {"message": "Success!"}
+            return {"message": "Success!"}, 200
 
 class ThemeAdminGet(Resource):
 
-    @jwt_required()
     def get(self, year, month, day):
-        if UserController.not_admin(current_identity):
-            return {"message": "Only the priveleged can come here. Get out peasant."}, 400
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+
+        if UserController.not_admin(client_id):
+            return {"message": "Only the priveleged can come here. Get out peasant."}, 401
         
         if safe_str_cmp(day, "all"):
             error_message, response = ThemeController.get_for_month(year, month)
@@ -89,8 +103,16 @@ class ThemeAdminGet(Resource):
 
 class Theme(Resource):
 
-    @jwt_required()
     def get(self, mode, index):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            access_token = auth_header.split(" ")[1]
+        else:
+            return {"message": "This method requires an authorization header."}, 400
+        error, client_id = auth_by_token(access_token)
+        if error:
+            return {"message": error}, 401
+
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()
         if safe_str_cmp(mode, "browse"):

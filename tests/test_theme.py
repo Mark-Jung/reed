@@ -56,6 +56,13 @@ class SavedTests(unittest.TestCase):
                 headers=dict(Authorization="Bearer " + token)
                 )
 
+    def edit_theme(self, theme, inspire, author, time, token):
+        return self.app.put(
+                '/themeadmin',
+                data=dict(theme=theme, theme_inspire=inspire, theme_author=author, release_time=time),
+                headers=dict(Authorization="Bearer " + token)
+                )
+
     def create_post(self, token, theme, anonymity, content):
         return self.app.post(
                 '/posts',
@@ -74,25 +81,23 @@ class SavedTests(unittest.TestCase):
     ###############
     #### tests ####
     ###############
-    def test_valid_saved_append_delete(self):
+    """
+    need to test:
+        Done - create theme for the day: credentials, overlapping themes.
+        Done - edit theme for the day, both early and late, but not after 5 minutes before release
+        Not Done - check that the theme actually changes over time
+    """
+    def test_valid_create_theme(self):
         """
-        tests appending a post to saved list of user, and incrementing
-            1. Create two users
-            2. Create a theme for the post
-            3. Make a post written by the second user
-            4. Add that post to saved
-            5. Check by getting User and Post info that it has been added and incremented
-        tests deleting a post from the saved list of user, and decrementing
-            1. Delete post added.
-            2. Check list and count that they are empty and 0
+        check that no other user except for the admin is allowed access for and creating.
         """
-        # register user mark 
+        # register user mark
         register_response = self.register('mark', '1018', 'who u?', 'me', 'hello')
         self.assertEqual(register_response.status_code, 201)
 
         # register user san
-        register_response_san = self.register('san', '0', 'who u?', 'sanrtvflee', 'i love movies')
-        self.assertEqual(register_response_san.status_code, 201)
+        register_response = self.register('san', '1018', 'who u?', 'sanrtvflee', 'i love movies')
+        self.assertEqual(register_response.status_code, 201)
 
         # login as mark
         login_response = self.login('mark', '1018')
@@ -101,9 +106,8 @@ class SavedTests(unittest.TestCase):
         self.assertEqual('Success!', login_response_data['message'])
         access_token_mark = login_response_data['access_token']
         self.assertTrue(access_token_mark)
-
-        # login as mark
-        login_response = self.login('san', '0')
+        # login as san
+        login_response = self.login('san', '1018')
         self.assertEqual(login_response.status_code, 200)
         login_response_data = json.loads(login_response.data.decode())
         self.assertEqual('Success!', login_response_data['message'])
@@ -112,104 +116,209 @@ class SavedTests(unittest.TestCase):
 
         self.assertNotEqual(access_token_san, access_token_mark)
 
-        # create theme
-        theme_response = self.create_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
-        self.assertEqual(theme_response.status_code, 201)
-        theme_data = json.loads(theme_response.data.decode())
-        self.assertEqual('Success!', theme_data['message'])
+        # create theme -error1: non-admin create
+        theme_create_error = self.create_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_san)
+        self.assertEqual(theme_create_error.status_code, 401)
 
-        # make post by second user, san
-        post_response = self.create_post(access_token_san, 'love', 'False', 'i love rtvf')
-        self.assertEqual(post_response.status_code, 201)
-        post_response_data = json.loads(post_response.data.decode())
-        self.assertEqual('Success!', post_response_data['message'])
+        # make post by san with a theme that's not there. should return error.
+        post_create_error = self.create_post(access_token_san, 'love', 'false', 'i love rtvf')
+        self.assertEqual(post_create_error.status_code, 400)
 
-        # get post and check 'saved' count starts as 0
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_san)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        san_post = get_by_theme_data['response'][0]
-        self.assertEqual(san_post['writer_username'], 'san')
-        self.assertEqual(san_post['saved'], 0)
+        # create theme -error2: created at wrong time1, before 6:30 am
+        theme_create_error = self.create_theme('love', 'moi', 'mark', '2018-1-20 2:30:00', access_token_san)
+        self.assertEqual(theme_create_error.status_code, 401)
 
-        # update saved for user mark and san's post (mark saving san's post)
-        saved_response = self.update_saved('append', '1', access_token_mark)
-        self.assertEqual(saved_response.status_code, 200)
+        # make post by san with a theme that's not there. should return error.
+        post_create_error = self.create_post(access_token_san, 'love', 'false', 'i love rtvf')
+        self.assertEqual(post_create_error.status_code, 400)
 
-        # get post and check 'saved' count set as 1
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_san)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        san_post = get_by_theme_data['response'][0]
-        self.assertEqual(san_post['writer_username'], 'san')
-        self.assertEqual(san_post['saved'], 1)
+        # create theme -error3: created at wrong time2, before 8:30pm but after 6:30am
+        theme_create_error = self.create_theme('love', 'moi', 'mark', '2018-1-20 10:31:23', access_token_san)
+        self.assertEqual(theme_create_error.status_code, 401)
 
-        # get user and check 'saved' list contains 1
-        user_get = self.app.get(
-                '/user/mark',
-                headers=dict(Authorization="Bearer " + access_token_san),
-                content_type='application/json'
-                )
-        self.assertEqual(user_get.status_code, 200)
-        mark_data = json.loads(user_get.data.decode())['user']
-        mark_saved_ls = mark_data['saved'].split(' ')
-        self.assertEqual('1', mark_saved_ls[0])
+        # make post by san with a theme that's not there. should return error.
+        post_create_error = self.create_post(access_token_san, 'love', 'false', 'i love rtvf')
+        self.assertEqual(post_create_error.status_code, 400)
 
-        # check that repetition of the method is useless 
-        saved_bad_response = self.update_saved('append', '1', access_token_mark)
-        self.assertEqual(saved_bad_response.status_code, 500)
-        saved_bad_data = json.loads(saved_bad_response.data.decode())
-        self.assertEqual(saved_bad_data['message'], 'Already saved that post.')
+        # create theme -error4: created at wrong time3, after 8:30 am
+        theme_create_error = self.create_theme('love', 'moi', 'mark', '2018-1-20 22:33:22', access_token_san)
+        self.assertEqual(theme_create_error.status_code, 401)
 
-        # check that the bad request had no effect
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_san)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        san_post = get_by_theme_data['response'][0]
-        self.assertEqual(san_post['writer_username'], 'san')
-        self.assertEqual(san_post['saved'], 1)
-        user_get = self.app.get(
-                '/user/mark',
-                headers=dict(Authorization="Bearer " + access_token_san),
-                content_type='application/json'
-                )
-        self.assertEqual(user_get.status_code, 200)
-        mark_data = json.loads(user_get.data.decode())['user']
-        mark_saved_ls = mark_data['saved'].split(' ')
-        self.assertEqual('1', mark_saved_ls[0])
+        # make post by san with a theme that's not there. should return error.
+        post_create_error = self.create_post(access_token_san, 'love', 'false', 'i love rtvf')
+        self.assertEqual(post_create_error.status_code, 400)
 
-        # update saved for user mark and san's post (mark delete
-        saved_response = self.update_saved('delete', '1', access_token_mark)
-        self.assertEqual(saved_response.status_code, 200)
+        # create theme -valid early time
+        theme_create_valid_early = self.create_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
+        self.assertEqual(theme_create_valid_early.status_code, 201)
 
-        # check that delete decreased count for post and user
-        get_by_theme = self.app.get(
-                '/postlist/theme/love',
-                headers=dict(Authorization="Bearer " + access_token_san)
-                )
-        self.assertEqual(get_by_theme.status_code, 200)
-        get_by_theme_data = json.loads(get_by_theme.data.decode())
-        san_post = get_by_theme_data['response'][0]
-        self.assertEqual(san_post['writer_username'], 'san')
-        self.assertEqual(san_post['saved'], 0)
-        user_get = self.app.get(
-                '/user/mark',
-                headers=dict(Authorization="Bearer " + access_token_san),
-                content_type='application/json'
-                )
-        self.assertEqual(user_get.status_code, 200)
-        mark_data = json.loads(user_get.data.decode())['user']
-        mark_saved_ls = mark_data['saved'].split(' ')
-        self.assertEqual('', mark_saved_ls[0])
+        # make post by san -valid theme early
+        post_create_valid = self.create_post(access_token_san, 'love', 'false', 'i love rtvf')
+        self.assertEqual(post_create_valid.status_code, 201)
+
+        # create theme -valid later time
+        theme_create_valid_late = self.create_theme('coding', 'moi', 'mark', '2018-1-20 20:30:00', access_token_mark)
+        self.assertEqual(theme_create_valid_late.status_code, 201)
+
+        # make post by san -valid theme late
+        post_create_valid = self.create_post(access_token_san, 'coding', 'false', 'i love rtvf')
+        self.assertEqual(post_create_valid.status_code, 201)
+
+        # create theme -invalid since overlapping theme
+        theme_create_invalid_overlap = self.create_theme('coding', 'moi', 'mark', '2018-1-20 20:30:00', access_token_mark)
+        self.assertEqual(theme_create_invalid_overlap.status_code, 400)
+
+    def test_valid_theme_get(self):
+        # register user mark
+        pass
+
+    def test_valid_theme_edit(self):
+        """
+        scenarios to test for:
+        Need to test if it was actually edited by using the get.
+            6 minutes before release time -valid
+                invalid release time for edit 
+                invalid theme(overlapping)
+                invalid credentials
+            4 minutes before release time -invalid
+            1 minute after release time -invalid
+            
+        """
+        # register user mark
+        register_response = self.register('mark', '1018', 'who u?', 'me', 'hello')
+        self.assertEqual(register_response.status_code, 201)
+
+        # register user san
+        register_response = self.register('san', '1018', 'who u?', 'sanrtvflee', 'i love movies')
+        self.assertEqual(register_response.status_code, 201)
+
+        valid_early_edit_time = datetime(2018, 1, 20, 6, 24, 0, 0)
+        # freeze time for creating theme -valid early time
+        with freeze_time(valid_early_edit_time):
+            # login as mark
+            login_response = self.login('mark', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_mark = login_response_data['access_token']
+            self.assertTrue(access_token_mark)
+
+            # login as san
+            login_response = self.login('san', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_san = login_response_data['access_token']
+
+            # create theme -valid early time
+            theme_create_early = self.create_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
+            self.assertEqual(theme_create_early.status_code, 201)
+            """
+            Check here with GET!!!!!
+            """
+        
+            # create theme -valid late time
+            theme_create_late = self.create_theme('coding', 'moi', 'mark', '2018-1-20 20:30:00', access_token_mark)
+            self.assertEqual(theme_create_late.status_code, 201)
+            """
+            Check here with GET!!!!!
+            """
+
+
+            # edit theme -valid early time
+            theme_edit_valid = self.edit_theme('peiru', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
+            self.assertEqual(theme_edit_valid.status_code, 200)
+            """
+            Check here with GET!!!!!
+            """
+            # edit theme -valid early time
+            theme_edit_valid = self.edit_theme('love', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
+            self.assertEqual(theme_edit_valid.status_code, 200)
+            """
+            Check here with GET!!!!!
+            """
+            # invalid release_time
+            theme_edit_invalid_release_time = self.edit_theme('peiru', 'moi', 'mark', '2018-1-30 8:30:00', access_token_mark)
+            self.assertEqual(theme_edit_invalid_release_time.status_code, 400)
+            """
+            Check here with GET!!!!!
+            """
+            # invalid theme
+            theme_edit_invalid_theme = self.edit_theme('coding', 'moi', 'mark', '2018-1-20 6:30:00', access_token_mark)
+            self.assertEqual(theme_edit_invalid_theme.status_code, 400)
+            """
+            Check here with GET!!!!!
+            """
+            # invalid credentials
+            theme_edit_invalid_credentials = self.edit_theme('coding', 'moi', 'mark', '2018-1-20 6:30:00', access_token_san)
+            self.assertEqual(theme_edit_invalid_credentials.status_code, 401)
+            """
+            Check here with GET!!!!!
+            """
+
+        invalid_early_edit_time = datetime(2018, 1, 30, 6, 26, 0, 0)
+        # freeze time for creating theme -valid early time
+        with freeze_time(invalid_early_edit_time):
+            # login as mark
+            login_response = self.login('mark', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_mark = login_response_data['access_token']
+            self.assertTrue(access_token_mark)
+
+            # login as san
+            login_response = self.login('san', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_san = login_response_data['access_token']
+
+            # create theme -valid early time
+            theme_create_early = self.create_theme('DFIR', 'moi', 'mark', '2018-1-30 6:30:00', access_token_mark)
+            self.assertEqual(theme_create_early.status_code, 201)
+            """
+            Check here with GET!!!!!
+            """
+
+            # edit theme -invalid due to time
+            invalid_theme_edit_early = self.edit_theme('love', 'moi', 'mark', '2018-1-30 6:30:00', access_token_mark)
+            self.assertEqual(invalid_theme_edit_early.status_code, 400)
+            """
+            Check here with GET!!!!!
+            """
+        
+        invalid_early_edit_time = datetime(2018, 1, 31, 6, 31, 0, 0)
+        # freeze time for creating theme -valid early time
+        with freeze_time(invalid_early_edit_time):
+            # login as mark
+            login_response = self.login('mark', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_mark = login_response_data['access_token']
+            self.assertTrue(access_token_mark)
+
+            # login as san
+            login_response = self.login('san', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_san = login_response_data['access_token']
+
+            # create theme -valid early time
+            theme_create_early = self.create_theme('LOL', 'moi', 'mark', '2018-1-31 6:30:00', access_token_mark)
+            self.assertEqual(theme_create_early.status_code, 201)
+
+            # edit theme -invalid due to time
+            invalid_theme_edit_late = self.edit_theme('love', 'moi', 'mark', '2018-1-31 6:30:00', access_token_mark)
+            self.assertEqual(invalid_theme_edit_late.status_code, 400)
+            """
+            Check here with GET!!!!!
+            """
+
+        
+
 
         
 

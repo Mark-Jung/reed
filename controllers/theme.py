@@ -19,19 +19,28 @@ class ThemeController():
             return "Error in creating and saving theme."
 
     def update_theme(release_time, theme, theme_inspire, theme_author):
+        # don't allow themes to be edited after 5 minutes prior to it's release time.
+        if (datetime.now() - release_time > timedelta(minutes=5)):
+            return "What has past is past. Live the present, anticipate the future, and embrace the past" 
+
         if (release_time.hour != 6 and release_time.hour != 20) or release_time.minute != 30 or release_time.second != 0:
-            return "Incorrect release time."
-        if ThemeModel.find_by_release_time(release_time):
-            return "Theme is already there for that time! Try PUT for edit."
-        target_theme = ThemeModel.find_by_theme(theme)
-        if not target_theme:
-            return "Theme could not be found."
-        target_theme.release_time = release_time
-        target_theme.theme = theme
-        target_theme.theme_inspire = theme_inspire
-        target_theme.theme_author = theme_author
+            return "Invalid release time."
+
+        by_release_time = ThemeModel.find_by_release_time(release_time)
+        if not by_release_time:
+            return "Create theme for the release time first."
+
+        by_theme = ThemeModel.find_by_theme(theme)
+        if by_theme:
+            if by_theme.id != by_release_time.id:
+                return "Theme attempting to edit is already taken. Try a new theme."
+        
+        # update
+        by_release_time.theme = theme
+        by_release_time.theme_inspire = theme_inspire
+        by_release_time.theme_author = theme_author
         try:
-            target_theme.save_to_db()
+            by_release_time.save_to_db()
         except:
             return "Error saving updated theme."
         return ""
