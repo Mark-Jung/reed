@@ -103,7 +103,7 @@ class ThemeAdminGet(Resource):
 
 class Theme(Resource):
 
-    def get(self, mode, index):
+    def get(self, mode, quantity):
         auth_header = request.headers.get('Authorization')
         if auth_header:
             access_token = auth_header.split(" ")[1]
@@ -115,11 +115,13 @@ class Theme(Resource):
 
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()
-        if safe_str_cmp(mode, "browse"):
-            error_message, response = ThemeController.browse(index)
+        elif safe_str_cmp(mode, "browse"):
+            error_message, response = ThemeController.browse(int(quantity))
         else:
             return {"message": "Unsupported mode."}, 400
+
         if error_message:
             return {"message": error_message}, 500
+
         return {"response": list(map(lambda x: x.json() if x else None, response))}
 

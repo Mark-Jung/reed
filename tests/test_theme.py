@@ -62,6 +62,11 @@ class SavedTests(unittest.TestCase):
                 data=dict(theme=theme, theme_inspire=inspire, theme_author=author, release_time=time),
                 headers=dict(Authorization="Bearer " + token)
                 )
+    def get_theme(self, mode, index, token):
+        return self.app.get(
+                '/theme/' + mode + '/' + index,
+                headers=dict(Authorization="Bearer " + token)
+                )
 
     def create_post(self, token, theme, anonymity, content):
         return self.app.post(
@@ -169,8 +174,58 @@ class SavedTests(unittest.TestCase):
         self.assertEqual(theme_create_invalid_overlap.status_code, 400)
 
     def test_valid_theme_get(self):
+        """
+        scenarios to test for:
+            theme changes after 6:30 am
+            theme doesn't change for random times between 6:30 am and 8:30 pm
+            theme chagnes after 8:30 pm
+            theme doesn't change for randome times between 8:30 pm today and 6:30 am tmr
+            If there is not theme for the assigned timed, it should return none.
+        """
         # register user mark
-        pass
+        register_response = self.register('mark', '1018', 'who u?', 'me', 'hello')
+        self.assertEqual(register_response.status_code, 201)
+
+        # register user san
+        register_response = self.register('san', '1018', 'who u?', 'sanrtvflee', 'i love movies')
+        self.assertEqual(register_response.status_code, 201)
+
+        login_and_create = datetime(2018, 2, 1, 6, 24, 0, 0)
+        # freeze time for creating theme -valid early time
+        with freeze_time(login_and_create):
+            # login as mark
+            login_response = self.login('mark', '1018')
+            self.assertEqual(login_response.status_code, 200)
+            login_response_data = json.loads(login_response.data.decode())
+            self.assertEqual('Success!', login_response_data['message'])
+            access_token_mark = login_response_data['access_token']
+            self.assertTrue(access_token_mark)
+
+            # create theme -valid early time
+            theme_create_early = self.create_theme('marks', 'moi', 'mark', '2018-2-1 6:30:00', access_token_mark)
+            self.assertEqual(theme_create_early.status_code, 201)
+            # go 15 minutes later theme release
+            theme_is_marks_time = datetime(2018, 2, 1, 6, 45, 0, 0)
+            with freeze_time(theme_is_marks_time):
+                get_theme_response = self.get_theme('now', '0', access_token_mark)
+                self.assertEqual(get_theme_response.status_code, 200)
+                get_theme_data = json.loads(get_theme_response.data.decode())
+                self.assertEqual(get_theme_data['response'][0]['theme'], 'marks')
+                self.assertEqual(get_theme_data['response'][0]['theme_inspire'], 'moi')
+                self.assertEqual(get_theme_data['response'][0]['theme_author'], 'mark')
+            for hour_delta in range(0, 13):
+                for minute_delta in range(0, 60):
+                    theme_still_marks_time = datetime(2018, 2, 1, hour_delta + 7, minute_delta, 0, 0)
+                    with freeze_time(theme_still_marks_time):
+                        get_theme_response = self.get_theme('now', '0', access_token_mark)
+                        get_theme_data = json.loads(get_theme_response.data.decode())
+                        self.assertEqual(get_theme_response.status_code, 200)
+                        self.assertEqual(get_theme_data['response'][0]['theme'], 'marks')
+                        self.assertEqual(get_theme_data['response'][0]['theme_inspire'], 'moi')
+                        self.assertEqual(get_theme_data['response'][0]['theme_author'], 'mark')
+
+
+
 
     def test_valid_theme_edit(self):
         """

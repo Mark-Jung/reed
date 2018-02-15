@@ -14,3 +14,10 @@ xcode(front-end), brew, pip, virtualenv,
 9. On your commandline, write: pip install -r requirements.txt
 10. Ask mark for his secret env variable
 11. run 'nose2' and see if all of the tests pass. If any doen't pass, alert mark IMMEDIATELY. 
+
+# Steps to do before running server
+1. git pull origin master
+2. source env/bin/activate
+3. export SECRET='<what i told you in the facebook messenger>'
+4. nose2 (if any errors come up, notify mark)
+5. python app.py

@@ -25,7 +25,7 @@ api.add_resource(UserRegister, '/register')
 api.add_resource(AuthLogin, '/login')
 api.add_resource(User, '/user/<string:username>')
 api.add_resource(SavedUpdate, '/saved')
-api.add_resource(Theme, '/theme/<string:mode>/<int:index>')
+api.add_resource(Theme, '/theme/<string:mode>/<string:quantity>')
 api.add_resource(ThemeAdmin, '/themeadmin')
 api.add_resource(ThemeAdminGet, '/adminget/<int:year>/<int:month>/<string:day>')
 
