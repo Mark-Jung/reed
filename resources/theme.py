@@ -103,7 +103,7 @@ class ThemeAdminGet(Resource):
 
 class Theme(Resource):
 
-    def get(self, mode, quantity):
+    def get(self, mode, days):
         auth_header = request.headers.get('Authorization')
         if auth_header:
             access_token = auth_header.split(" ")[1]
@@ -116,7 +116,7 @@ class Theme(Resource):
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()
         elif safe_str_cmp(mode, "browse"):
-            error_message, response = ThemeController.browse(int(quantity))
+            error_message, response = ThemeController.browse(int(days))
         else:
             return {"message": "Unsupported mode."}, 400
 

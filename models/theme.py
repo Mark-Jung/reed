@@ -35,12 +35,12 @@ class ThemeModel(db.Model):
         return cls.query.filter_by(release_time=current_time).first()
 
     @classmethod
-    def list_below_by_release_time(cls, current_time):
-        return cls.query.filter(release_time <= current_time).order_by(desc(Thememodel.saved)).limit(30).all()
+    def list_between_by_release_time(cls, lowbound_time, highbound_time, limit):
+        return cls.query.filter(cls.release_time <= highbound_time, cls.release_time >= lowbound_time).order_by(desc(cls.release_time)).limit(limit).all()
 
     @classmethod
     def get_count(cls, current_time):
-        return cls.query.filter(release_time <= current_time).count()
+        return cls.query.filter(cls.release_time <= current_time).count()
 
     def save_to_db(self):
         db.session.add(self)

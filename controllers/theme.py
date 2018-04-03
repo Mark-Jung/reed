@@ -54,13 +54,11 @@ class ThemeController():
         tmr_release1 = release1 + timedelta(days=1) 
 
         if current < release1:
-            wanted_theme_time = yesterday_release2
+            wanted_theme_time = yest_release2
         elif (current >= release1) and (current < release2):
             wanted_theme_time = release1
-            #print('sending out theme for '+ str(wanted_theme_time.hour) + ':30')
         elif current > release2 and current < tmr_release1:
             wanted_theme_time = release2
-            #print('sending out theme for '+ str(wanted_theme_time.hour) + ':30')
         else:
             return "Invalid time.", None
 
@@ -71,15 +69,17 @@ class ThemeController():
         else:
             return "", wanted_theme
 
-    def browse(quantity):
+    def browse(days):
         current = datetime.now()
-        if index < 0:
+        quantity = days * 2
+        if quantity < 0:
             return "Cannot go to the future.", None
         elif quantity > ThemeModel.get_count(current):
             return "No more themes.", None
         else:
-            wanted_time = current + timedelta(days=quantity)
-            list_of_themes = ThemeModel.list_below_by_release_time(wanted_time)
+            lowbound_time = current - timedelta(days=days)
+            highbound_time = current
+            list_of_themes = ThemeModel.list_between_by_release_time(lowbound_time, highbound_time, quantity)
             if not list_of_themes:
                 return "No more themes.", None
             return "", list_of_themes
