@@ -30,7 +30,9 @@ class UserModel(db.Model):
         self.question = question
         self.answer = answer
         self.saved_count = 0
-        self.intro = intro 
+        self.intro = intro
+        self.following_count = 0
+        self.followed_by_count = 0
        
     def password_is_valid(self, password):
         """

@@ -3,7 +3,6 @@ from datetime import datetime
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from securities.security import auth_by_token
-
 from werkzeug.security import safe_str_cmp
 
 from controllers.theme import ThemeController
@@ -112,7 +111,6 @@ class Theme(Resource):
         error, client_id = auth_by_token(access_token)
         if error:
             return {"message": error}, 401
-
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()
         elif safe_str_cmp(mode, "browse"):

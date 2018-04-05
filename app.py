@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt import JWT
 from datetime import datetime, timedelta
+from flask_cors import CORS
 
 from security import authenticate, identity
 from resources.user import UserRegister, User
@@ -16,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=2592000)
 app.secret_key = 'reedforfun'
 api = Api(app)
+CORS(app)
 
 jwt = JWT(app, authenticate, identity)  # /auth jwt creates this endpoint
 

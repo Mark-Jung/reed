@@ -64,7 +64,7 @@ class ThemeController():
 
         wanted_theme = []
         wanted_theme.append(ThemeModel.find_by_release_time(wanted_theme_time))
-        if not wanted_theme:
+        if not wanted_theme[0]:
             return "Daily theme not available right now.", None
         else:
             return "", wanted_theme
@@ -75,8 +75,7 @@ class ThemeController():
         if quantity < 0:
             return "Cannot go to the future.", None
         elif quantity > ThemeModel.get_count(current):
-            return "No more themes.", None
-        else:
+            quantity = ThemeModel.get_count(current)
             lowbound_time = current - timedelta(days=days)
             highbound_time = current
             list_of_themes = ThemeModel.list_between_by_release_time(lowbound_time, highbound_time, quantity)
