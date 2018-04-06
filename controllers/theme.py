@@ -1,5 +1,7 @@
 from models.theme import ThemeModel
+from models.user import UserModel
 from datetime import datetime, timedelta
+
 
 class ThemeController():
 
@@ -21,7 +23,7 @@ class ThemeController():
     def update_theme(release_time, theme, theme_inspire, theme_author):
         # don't allow themes to be edited after 5 minutes prior to it's release time.
         if (datetime.now() - release_time > timedelta(minutes=5)):
-            return "What has past is past. Live the present, anticipate the future, and embrace the past" 
+            return "What has past is past. Live the present, anticipate the future, and embrace the past"
 
         if (release_time.hour != 6 and release_time.hour != 20) or release_time.minute != 30 or release_time.second != 0:
             return "Invalid release time."
@@ -34,7 +36,7 @@ class ThemeController():
         if by_theme:
             if by_theme.id != by_release_time.id:
                 return "Theme attempting to edit is already taken. Try a new theme."
-        
+
         # update
         by_release_time.theme = theme
         by_release_time.theme_inspire = theme_inspire
@@ -50,8 +52,8 @@ class ThemeController():
         current = datetime.now()
         release1 = datetime(current.year, current.month, current.day, 6, 30, 0)
         release2 = datetime(current.year, current.month, current.day, 20, 30, 0)
-        yest_release2 = release2 - timedelta(days=1) 
-        tmr_release1 = release1 + timedelta(days=1) 
+        yest_release2 = release2 - timedelta(days=1)
+        tmr_release1 = release1 + timedelta(days=1)
 
         if current < release1:
             wanted_theme_time = yest_release2
@@ -69,9 +71,12 @@ class ThemeController():
         else:
             return "", wanted_theme
 
-    def browse(days):
+    def browse(days, client_id):
         current = datetime.now()
         quantity = days * 2
+
+        # need to get client_id from the Resouce(view)
+
         if quantity < 0:
             return "Cannot go to the future.", None
         elif quantity > ThemeModel.get_count(current):
@@ -79,9 +84,20 @@ class ThemeController():
             lowbound_time = current - timedelta(days=days)
             highbound_time = current
             list_of_themes = ThemeModel.list_between_by_release_time(lowbound_time, highbound_time, quantity)
+
             if not list_of_themes:
                 return "No more themes.", None
+
+            # call UserModel.written through client_id
+            target = UserModel.find_by_id(client_id)
+            for wrote in target.written:
+                if list_of_themes[wrote]:
+                    list_of_theme[wrote].json().append({'written': True}) #
+                else:
+                    list_of_theme[wrote].json().append({'written': False}) #
+
             return "", list_of_themes
+
 
     def get_for_day(year, month, day):
         release1 = datetime(year, month, day, 6, 30, 0)
@@ -96,4 +112,3 @@ class ThemeController():
 
     def get_for_month(year, month):
         pass
-

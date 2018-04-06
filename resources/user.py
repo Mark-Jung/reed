@@ -43,7 +43,7 @@ class UserRegister(Resource):
         if error_message:
             return {"message": error_message}, status
 
-        return {"message": "Success!"}, 201 
+        return {"message": "Success!"}, 201
 
 class User(Resource):
 
@@ -58,10 +58,10 @@ class User(Resource):
             required=False,
             help="This field is the optional payload for the request."
         )
-   
+
     def get(self, username):
         """
-        checks if the request is authorized. 
+        checks if the request is authorized.
         Then uses username to give the usermodel in json form.
         """
         auth_header = request.headers.get('Authorization')
@@ -92,4 +92,3 @@ class User(Resource):
             return {"message": "Success!"}, 200
         elif not error_message and type(myfault) is list:
             return myfault, 200
-

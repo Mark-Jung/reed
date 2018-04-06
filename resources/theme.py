@@ -48,7 +48,7 @@ class ThemeAdmin(Resource):
             return {"message": "Only the priveleged can come here. Get out peasant."}, 401
 
         data = ThemeAdmin.parser.parse_args()
-        error_message = ThemeController.create_theme(data["release_time"], data["theme"], data["theme_inspire"], data["theme_author"]) 
+        error_message = ThemeController.create_theme(data["release_time"], data["theme"], data["theme_inspire"], data["theme_author"])
         if error_message:
             return {"message": error_message}, 400
         else:
@@ -87,7 +87,7 @@ class ThemeAdminGet(Resource):
 
         if UserController.not_admin(client_id):
             return {"message": "Only the priveleged can come here. Get out peasant."}, 401
-        
+
         if safe_str_cmp(day, "all"):
             error_message, response = ThemeController.get_for_month(year, month)
         elif day.isdigit():
@@ -114,7 +114,7 @@ class Theme(Resource):
         if safe_str_cmp(mode, "now"):
             error_message, response = ThemeController.get_now()
         elif safe_str_cmp(mode, "browse"):
-            error_message, response = ThemeController.browse(int(days))
+            error_message, response = ThemeController.browse(int(days), client_id)
         else:
             return {"message": "Unsupported mode."}, 400
 
@@ -122,4 +122,3 @@ class Theme(Resource):
             return {"message": error_message}, 500
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}
-

@@ -1,11 +1,17 @@
 from db import db
 from models.user import UserModel
+from models.theme import ThemeModel
 from sqlalchemy import desc
 
 class PostModel(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
+    tid = db.Column('tid', db.Integer, db.ForeignKey(ThemeModel.id)) #
+
+    # written = db.relationship(
+    #     'PostModel', order_by="PostModel.date_created", cascade="all, delete-orphan")
+
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
     content = db.Column(db.String(248))
@@ -74,4 +80,3 @@ class PostModel(db.Model):
             return ""
         except:
             return "Error while incrementing desired post's saved count"
-
