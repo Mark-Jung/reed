@@ -36,6 +36,10 @@ class PostModel(db.Model):
     def json(self):
         return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved}
 
+    # def json_written(self):
+    #     return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved, 'written': self.written}
+
+
     @classmethod
     def filter_by_writer_id(cls, writer_id):
         return cls.query.filter_by(writer_id=writer_id).all()

@@ -109,6 +109,7 @@ class Theme(Resource):
         else:
             return {"message": "This method requires an authorization header."}, 400
         error, client_id = auth_by_token(access_token)
+
         if error:
             return {"message": error}, 401
         if safe_str_cmp(mode, "now"):
@@ -120,5 +121,7 @@ class Theme(Resource):
 
         if error_message:
             return {"message": error_message}, 500
+        if safe_str_cmp(mode, "browse"):
+            return {"response": response}
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}

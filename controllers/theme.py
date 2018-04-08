@@ -72,31 +72,43 @@ class ThemeController():
             return "", wanted_theme
 
     def browse(days, client_id):
+        # need to get client_id from the Resouce(view)
         current = datetime.now()
         quantity = days * 2
 
-        # need to get client_id from the Resouce(view)
-
         if quantity < 0:
             return "Cannot go to the future.", None
-        elif quantity > ThemeModel.get_count(current):
+
+        elif quantity >= ThemeModel.get_count(current):
             quantity = ThemeModel.get_count(current)
             lowbound_time = current - timedelta(days=days)
             highbound_time = current
             list_of_themes = ThemeModel.list_between_by_release_time(lowbound_time, highbound_time, quantity)
+            new_list_of_themes = []
+            # print(list_of_themes) # 2EA
+            # print(list_of_themes[1].json()) #1
 
             if not list_of_themes:
                 return "No more themes.", None
 
             # call UserModel.written through client_id
             target = UserModel.find_by_id(client_id)
-            for wrote in target.written:
-                if list_of_themes[wrote]:
-                    list_of_theme[wrote].json().append({'written': True}) #
-                else:
-                    list_of_theme[wrote].json().append({'written': False}) #
+            # print(target.written[0].json())
 
-            return "", list_of_themes
+            for theme in list_of_themes:
+                json_written = theme.json()
+                for post in target.written:
+                    if theme.theme == post.theme:
+                        json_written.update({'written': True})
+                    else:
+                        json_written.update({'written': False})
+                new_list_of_themes.append(json_written)
+            print(new_list_of_themes)
+
+            # print(json_written)
+
+            # return "", list_of_themes
+            return "", new_list_of_themes
 
 
     def get_for_day(year, month, day):
