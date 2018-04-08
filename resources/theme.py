@@ -119,9 +119,11 @@ class Theme(Resource):
         else:
             return {"message": "Unsupported mode."}, 400
 
-        if error_message:
-            return {"message": error_message}, 500
         if safe_str_cmp(mode, "browse"):
             return {"response": response}
+
+        if error_message:
+            return {"message": error_message}, 500
+
 
         return {"response": list(map(lambda x: x.json() if x else None, response))}

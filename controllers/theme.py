@@ -79,7 +79,7 @@ class ThemeController():
         if quantity < 0:
             return "Cannot go to the future.", None
 
-        elif quantity >= ThemeModel.get_count(current):
+        elif quantity >= ThemeModel.get_count(current) or quantity < ThemeModel.get_count(current):
             quantity = ThemeModel.get_count(current)
             lowbound_time = current - timedelta(days=days)
             highbound_time = current

@@ -8,10 +8,6 @@ class PostModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     tid = db.Column('tid', db.Integer, db.ForeignKey(ThemeModel.id)) #
-
-    # written = db.relationship(
-    #     'PostModel', order_by="PostModel.date_created", cascade="all, delete-orphan")
-
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
     content = db.Column(db.String(248))
