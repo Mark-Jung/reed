@@ -50,7 +50,7 @@ print('create new theme one: {0}'.format(new_theme.status_code))
 for i in range(30):
     payload = {
         "release_time": str(datetime(2018, 3, i+1, 20, 30, 00)),
-        "theme": "theme_march" + str(i+1),
+        "theme": "themeMarch" + str(i+1),
         "theme_inspire": "inspire" + str(i+1),
         "theme_author": "author" + str(i+1)
     }
@@ -61,7 +61,7 @@ for i in range(30):
 for i in range(28):
     payload = {
         "release_time": str(datetime(2018, 4, i+1, 20, 30, 00)),
-        "theme": "theme_april" + str(i+1),
+        "theme": "themeApril" + str(i+1),
         "theme_inspire": "inspire" + str(i+1),
         "theme_author": "author" + str(i+1)
     }
@@ -84,12 +84,12 @@ for i in range(28):
 for i in range(28):
     if (i%2 == 0):
         payload = {
-            "theme": "theme_march" + str(i+1),
+            "theme": "themeMarch" + str(i+1),
             "anonymity": "False",
             "content": "post by mark"
         }
         payload_april = {
-            "theme": "theme_april" + str(i+1),
+            "theme": "themeApril" + str(i+1),
             "anonymity": "False",
             "content": "post by mark"
         }
@@ -102,15 +102,15 @@ for i in range(28):
 
 tokens= []
 for i in range(28):
-    client_payload = {
-        "username": "san" + str(i),
-        "password": "0207",
-        "question": "fav color",
-        "answer": "orange",
-        "intro": "hi I'm San" + str(i)
-    }
-    user_client = requests.post(baseurl + "/register", data=json.dumps(client_payload), headers=json_headers)
-    print('created user: {0}'.format(user_client.status_code))
+    # client_payload = {
+    #     "username": "san" + str(i),
+    #     "password": "0207",
+    #     "question": "fav color",
+    #     "answer": "orange",
+    #     "intro": "hi I'm San" + str(i)
+    # }
+    # user_client = requests.post(baseurl + "/register", data=json.dumps(client_payload), headers=json_headers)
+    # print('created user: {0}'.format(user_client.status_code))
     login_payload = {
         "username": "san" + str(i),
         "password": "0207"
@@ -126,12 +126,12 @@ for i in range(28):
     # let the admin post in march every other day
     for header in tokens:
         payload = {
-            "theme": "theme_march" + str(i+1),
+            "theme": "themeMarch" + str(i+1),
             "anonymity": "False",
             "content": "post by user"
         }
         payload_april = {
-            "theme": "theme_april" + str(i+1),
+            "theme": "themeApril" + str(i+1),
             "anonymity": "False",
             "content": "post by san" + str(i)
         }
