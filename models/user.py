@@ -112,4 +112,3 @@ class UserModel(db.Model):
         except jwt.InvalidTokenError:
             # the token is invalid, return an error string
             return "Invalid token. Please register or login", None
-

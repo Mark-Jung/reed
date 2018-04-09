@@ -8,7 +8,7 @@ class PostModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
-    content = db.Column(db.String(248))
+    content = db.Column(db.String(5000))
     liked = db.Column(db.Integer)
     saved = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
@@ -28,7 +28,7 @@ class PostModel(db.Model):
         self.saved = 0
 
     def json(self):
-        return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved}
+        return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved, 'created': self.date_created.strftime("%Y-%m-%d %H:%M:%S"),}
 
     @classmethod
     def filter_by_writer_id(cls, writer_id):
