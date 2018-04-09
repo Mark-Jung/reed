@@ -5,7 +5,7 @@ from models.user import UserModel
 from werkzeug.security import safe_str_cmp
 
 class PostController():
-    
+
     def create_post(theme, anonymity, writer_id, content):
         # check if that theme exists
         # check if that username exists
@@ -80,5 +80,3 @@ class PostListController():
         if not theme_nospace.isalnum():
             return "Theme should only be consisted of alphabets, numbers, and spaces", None
         return "", PostModel.filter_by_most_saved(theme)
-
-

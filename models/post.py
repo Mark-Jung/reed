@@ -1,11 +1,13 @@
 from db import db
 from models.user import UserModel
+from models.theme import ThemeModel
 from sqlalchemy import desc
 
 class PostModel(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
+    tid = db.Column('tid', db.Integer, db.ForeignKey(ThemeModel.id)) #
     theme = db.Column(db.String(50))
     anonymity = db.Column(db.Boolean)
     content = db.Column(db.String(5000))
@@ -29,6 +31,10 @@ class PostModel(db.Model):
 
     def json(self):
         return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved, 'created': self.date_created.strftime("%Y-%m-%d %H:%M:%S"),}
+
+    # def json_written(self):
+    #     return {'id': self.id, 'theme': self.theme, 'anonymity': self.anonymity, 'writer_id': self.writer_id, 'writer_username': UserModel.find_by_id(self.writer_id).username, 'content': self.content, 'saved': self.saved, 'written': self.written}
+
 
     @classmethod
     def filter_by_writer_id(cls, writer_id):
@@ -74,4 +80,3 @@ class PostModel(db.Model):
             return ""
         except:
             return "Error while incrementing desired post's saved count"
-

@@ -33,7 +33,7 @@ class UserModel(db.Model):
         self.intro = intro
         self.following_count = 0
         self.followed_by_count = 0
-       
+
     def password_is_valid(self, password):
         """
         Checks the password against it's hash to validates the user's password
@@ -57,7 +57,7 @@ class UserModel(db.Model):
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).first()
-    
+
     def generate_token(self, _id):
         """ Generates the access token"""
         try:

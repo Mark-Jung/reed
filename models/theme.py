@@ -1,4 +1,4 @@
-from db import db 
+from db import db
 from sqlalchemy import desc
 
 class ThemeModel(db.Model):
@@ -49,4 +49,3 @@ class ThemeModel(db.Model):
     def delete_from_db(self):
         db.session.delete(self)
         db.session.commit()
-
